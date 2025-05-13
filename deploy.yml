@@ -1,0 +1,22 @@
+name: sast-function
+entryPoint: webhook_entry_point
+runtime: python311
+region: us-central1
+serviceAccountEmail: sast-func@YOUR_PROJECT_ID.iam.gserviceaccount.com
+environmentVariables:
+  DEBUG: "true"
+  EXTERNAL_API_TOKEN: "your_external_api_token_here"
+  OPENAI_API_KEY: "your_openai_api_key_here"
+  WEBHOOK_SECRET: "your_webhook_secret_here"
+  WEBHOOK_SIGNATURE_SECRET: "your_webhook_signature_secret_here"
+  EXTERNAL_WEBHOOK_URL: "https://your-webhook-url.example.com"
+sourceDirectory: .
+trigger:
+  httpTrigger: {}
+  securityLevel: SECURE_ALWAYS
+ingressSettings: ALLOW_INTERNAL_AND_GCLB
+availableMemoryMb: 512
+timeoutSeconds: 60
+git init
+git add .
+git commit -m "Initial public version of SAST webhook function"
