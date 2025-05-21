@@ -39,86 +39,73 @@ pip install -r requirements.txt
 ```
 
 ---
+# 🔐 Secure Code Review Assistant (OpenAI-based)
+
+This project provides an automated way to analyze code diffs and pull requests using OpenAI's Assistants API, including file exclusion and tool-based analysis (e.g. `code_interpreter`, `file_search`).
+
+---
+
+## 🧪 Features
+
+- Filters sensitive files from diffs (e.g. `.env`, `*.pem`, `credentials`)
+- Splits large diffs by file
+- Submits chunks to OpenAI Assistant with context
+- Waits for threaded responses and consolidates feedback
+- Logs debug output if `DEBUG=true`
+
+---
+
+## 🛠️ Assistant Setup
+
+To use this script, you must first create an Assistant via OpenAI's platform:
+
+- Go to: [https://platform.openai.com/assistants](https://platform.openai.com/assistants)
+- Create an assistant with the appropriate instructions, tools, and (optionally) uploaded files
+- Copy the Assistant ID and use it in your `.env` file
 
 ## ⚙️ Environment Variables
 
-Set the following variables in your deployment environment:
+Create a `.env` file in the project root with the following keys:
 
-| Variable Name             | Description                                
-|---------------------------|-------------------------------------------------------------
-| `DEBUG`                   | Enable verbose logging (true/false)        
-| `EXTERNAL_API_TOKEN`      | Token to fetch PR from GIT diffs                    
-| `OPENAI_API_KEY`          | OpenAI API key                             
-| `WEBHOOK_SECRET`          | Token to authenticate outgoing webhook to ticketing system   
-| `WEBHOOK_SIGNATURE_SECRET`| Secret for validating incoming signatures 
-| `EXTERNAL_WEBHOOK_URL`    | Where to send the final analysis summary to ticketing system
-
----
-
-## 🧪 Local Testing
-
-You can run this as a basic Flask app for testing:
-
-```python
-from flask import Flask, request
-from sastFunc import webhook_entry_point
-
-app = Flask(__name__)
-
-@app.route("/webhook", methods=["POST"])
-def handle_webhook():
-    return webhook_entry_point(request)
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=8080)
+```env
+OPENAI_API_KEY=your_openai_api_key
+OPENAI_ASSISTANT_ID=your_assistant_id
+OPENAI_FILE_IDS=file-id-1,file-id-2  # comma-separated file IDs, optional
+DEBUG=true
 ```
 
-> For Google Cloud Functions, simply export `webhook_entry_point()` as the function handler.
+---
+
+## 🚀 Run
+
+as a serveless function 
+---
+
+## 🛑 Sensitive File Filtering
+
+The script automatically excludes files containing:
+
+- `.env`, `secret`, `credentials`, `.pem`, `.key`, etc.
+
+Modify `exclude_sensitive_files()` if needed.
 
 ---
 
-## 🧱 Function Entry Point
+## 🧩 Dependencies
 
-To deploy as a serverless function:
+Install required libraries:
 
-- **Google Cloud Functions**:  
-  Use `webhook_entry_point` as your entry point (target)
-  
-- **AWS Lambda (via Flask + Zappa)**:  
-  Deploy `app` object with handler mapped to `/webhook`
-
-- **Azure Functions**:  
-  Use a WSGI adapter to wrap Flask
+```bash
+pip install openai python-dotenv flask
+```
 
 ---
 
-## 📑 Example Output
+## 📁 Example `.env`
 
-The Markdown summary includes:
-- Finding title
-- File and line number
-- Explanation of the issue
-- Relevant code snippet (up to 3 lines)
-
----
-
-## ✅ Development Notes
-
-- Diffs are filtered using the `exclude_sensitive_files()` function.
-- Analysis is performed using OpenAI's GPT-4 Turbo with a low temperature for consistent results.
-- All secrets are injected via environment variables (never hardcoded).
-
----
-
-## 🛡️ Disclaimer
-
-This code is intended for educational and internal tooling purposes. Review and test carefully before deploying to production environments.
-
----
-
-## 📬 Contributions
-
-Feel free to open issues or submit PRs to:
-- Expand Git provider integrations
-- Add analysis enrichment
-- Improve resiliency and logging
+```env
+OPENAI_API_KEY=sk-...
+OPENAI_ASSISTANT_ID=asst_...
+OPENAI_FILE_IDS=file-abc123,file-def456
+DEBUG=true
+```
